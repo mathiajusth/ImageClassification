@@ -5,5 +5,7 @@
 2. Install Keras
 
 3. Extract features
-  - python preproc.py --image <pathToImage> --model inception
   - https://keras.io/applications/#inceptionv3
+  - run on example image: python preprocExample.py --image "pathToImage" --model inception
+  - run on coco dataset: python preprocCoco.py --image COCO/easier --model inception
+  
