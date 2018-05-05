@@ -72,7 +72,7 @@ for f in listdir(args["image"]):
 	# load the input image using the Keras helper utility while ensuring
 	# the image is resized to `inputShape`, the required input dimensions
 	# for the ImageNet pre-trained network
-	print("[INFO] loading and pre-processing image...")
+ 	print("[INFO] loading and pre-processing image...")
 	img = image.load_img(args["image"]+"/"+f, target_size=(224, 224))
 	x = image.img_to_array(img)
 	x = np.expand_dims(x, axis=0)
@@ -81,7 +81,7 @@ for f in listdir(args["image"]):
 	features = model.predict(x)
 	# print(features)
 
-	np.savetxt('data.csv', features, delimiter=' ')
+	# np.savetxt('data.csv', features, delimiter=' ')
 
 
 	counter = collections.defaultdict(int)
