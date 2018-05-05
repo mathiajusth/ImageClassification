@@ -68,11 +68,13 @@ print("[INFO] loading {}...".format(args["model"]))
 Network = MODELS[args["model"]]
 model = Network(weights="imagenet")
 
+imgNumber = 0
 for f in listdir(args["image"]):
+	imgNumber += 1
 	# load the input image using the Keras helper utility while ensuring
 	# the image is resized to `inputShape`, the required input dimensions
 	# for the ImageNet pre-trained network
- 	print("[INFO] loading and pre-processing image...")
+	print("[INFO] loading and pre-processing image number: {0}...".format(imgNumber))
 	img = image.load_img(args["image"]+"/"+f, target_size=(224, 224))
 	x = image.img_to_array(img)
 	x = np.expand_dims(x, axis=0)
