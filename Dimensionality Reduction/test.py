@@ -113,8 +113,10 @@ true_pos = np.diag(cm)
 false_pos = np.sum(cm, axis=0) - true_pos
 false_neg = np.sum(cm, axis=1) - true_pos
 
-precision = np.sum(true_pos / true_pos+false_pos)
-recall = np.sum(true_pos / true_pos + false_neg)
+#print(false_neg,false_pos)
+
+precision = sum(true_pos) / (sum(true_pos)+sum(false_pos))
+recall = sum(true_pos) / (sum(true_pos) + sum(false_neg))
 
 print("Precision: ", precision) #??
 print("Recall: ", recall) #??
@@ -147,11 +149,13 @@ true_pos = np.diag(cm)
 false_pos = np.sum(cm, axis=0) - true_pos
 false_neg = np.sum(cm, axis=1) - true_pos
 
-precision = np.sum(true_pos / true_pos+false_pos)
-recall = np.sum(true_pos / true_pos + false_neg)
+#print(false_neg,false_pos)
+
+precision = sum(true_pos) / (sum(true_pos)+sum(false_pos))
+recall = sum(true_pos) / (sum(true_pos) + sum(false_neg))
 
 print("Precision: ", precision) #??
-print("Recall: ", recall)  #??
+print("Recall: ", recall) #??
 
 
 
@@ -174,9 +178,11 @@ true_pos = np.diag(cm)
 false_pos = np.sum(cm, axis=0) - true_pos
 false_neg = np.sum(cm, axis=1) - true_pos
 
-precision = np.sum(true_pos / true_pos+false_pos)
-recall = np.sum(true_pos / true_pos + false_neg)
+#print(false_neg,false_pos)
+
+precision = sum(true_pos) / (sum(true_pos)+sum(false_pos))
+recall = sum(true_pos) / (sum(true_pos) + sum(false_neg))
 
 print("Precision: ", precision) #??
-print("Recall: ", recall)  #??
+print("Recall: ", recall) #??
 
