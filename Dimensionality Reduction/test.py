@@ -34,7 +34,6 @@ features = pd.read_csv(args['data'], header=None)
 df = pd.concat([classVar['x'].reset_index(), features], axis=1)
 
 
-
 for i in range(len(df['x'])):
 	if (df['x'][i] == "cat"):
 		df.loc[i,'x'] = 1
@@ -86,7 +85,7 @@ test_img = scaler.transform(test_img)
 
 from sklearn.decomposition import PCA
 # Make an instance of the Model
-pca = PCA(.95)
+pca = PCA(.90)
 
 pca.fit(train_img)
 train_img = pca.transform(train_img)
@@ -99,12 +98,85 @@ logisticRegr = LogisticRegression(solver = 'lbfgs')
 
 print(logisticRegr.fit(train_img, train_lbl))
 
-# Predict for One Observation (image)
-print(logisticRegr.predict(test_img[0].reshape(1,-1)))
+
 
 # Predict for One Observation (image)
-print(logisticRegr.predict(test_img[0:10]))
+preds = logisticRegr.predict(test_img)
 
-print(logisticRegr.score(test_img, test_lbl))
+print(pd.crosstab(test_lbl, preds, rownames=['Actual classes'], colnames=['Predicted classes']))
+print("Logistic Regression: ", logisticRegr.score(test_img, test_lbl))
+#print("Cross validation: ", cross_val_score(logisticRegr, features, df['x'], scoring='accuracy',cv=5))
 
+cm = pd.crosstab(test_lbl, preds, rownames=['Actual classes'], colnames=['Predicted classes'])
+
+true_pos = np.diag(cm)
+false_pos = np.sum(cm, axis=0) - true_pos
+false_neg = np.sum(cm, axis=1) - true_pos
+
+precision = np.sum(true_pos / true_pos+false_pos)
+recall = np.sum(true_pos / true_pos + false_neg)
+
+print("Precision: ", precision) #??
+print("Recall: ", recall) #??
+
+
+#Random Forest
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.datasets import make_classification
+
+
+
+# Create a random forest Classifier. By convention, clf means 'Classifier'
+clf = RandomForestClassifier(n_jobs=2, random_state=0)
+
+# Train the Classifier to take the training features and learn how they relate
+# to the training y (the species)
+print(clf.fit(train_img,train_lbl))
+
+
+preds =clf.predict(test_img)
+
+print(pd.crosstab(test_lbl, preds, rownames=['Actual classes'], colnames=['Predicted classes']))
+print("Random forest: ", clf.score(test_img, test_lbl))
+
+from sklearn.model_selection import cross_val_score
+print("Cross validation: ", cross_val_score(clf, features, df['x'], scoring='accuracy',cv=5))
+cm = pd.crosstab(test_lbl, preds, rownames=['Actual classes'], colnames=['Predicted classes'])
+
+true_pos = np.diag(cm)
+false_pos = np.sum(cm, axis=0) - true_pos
+false_neg = np.sum(cm, axis=1) - true_pos
+
+precision = np.sum(true_pos / true_pos+false_pos)
+recall = np.sum(true_pos / true_pos + false_neg)
+
+print("Precision: ", precision) #??
+print("Recall: ", recall)  #??
+
+
+
+#Support Vector Machine
+from sklearn import svm
+
+svmclf = svm.SVC(decision_function_shape='ovo')
+print(svmclf.fit(train_img,train_lbl))
+
+preds =svmclf.predict(test_img)
+
+print(pd.crosstab(test_lbl, preds, rownames=['Actual classes'], colnames=['Predicted classes']))
+print("Default Support Vector Machines: ", svmclf.score(test_img, test_lbl))
+
+print("Cross validation:", cross_val_score(svmclf, features, df['x'], scoring='accuracy',cv=5))
+
+cm = pd.crosstab(test_lbl, preds, rownames=['Actual classes'], colnames=['Predicted classes'])
+
+true_pos = np.diag(cm)
+false_pos = np.sum(cm, axis=0) - true_pos
+false_neg = np.sum(cm, axis=1) - true_pos
+
+precision = np.sum(true_pos / true_pos+false_pos)
+recall = np.sum(true_pos / true_pos + false_neg)
+
+print("Precision: ", precision) #??
+print("Recall: ", recall)  #??
 
