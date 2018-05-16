@@ -118,8 +118,8 @@ false_neg = np.sum(cm, axis=1) - true_pos
 precision = sum(true_pos) / (sum(true_pos)+sum(false_pos))
 recall = sum(true_pos) / (sum(true_pos) + sum(false_neg))
 
-print("Precision: ", precision) #??
-print("Recall: ", recall) #??
+#print("Precision: ", precision) #??
+#print("Recall: ", recall) #??
 
 
 #Random Forest
@@ -154,8 +154,8 @@ false_neg = np.sum(cm, axis=1) - true_pos
 precision = sum(true_pos) / (sum(true_pos)+sum(false_pos))
 recall = sum(true_pos) / (sum(true_pos) + sum(false_neg))
 
-print("Precision: ", precision) #??
-print("Recall: ", recall) #??
+#print("Precision: ", precision) #??
+#print("Recall: ", recall) #??
 
 
 
@@ -183,6 +183,6 @@ false_neg = np.sum(cm, axis=1) - true_pos
 precision = sum(true_pos) / (sum(true_pos)+sum(false_pos))
 recall = sum(true_pos) / (sum(true_pos) + sum(false_neg))
 
-print("Precision: ", precision) #??
-print("Recall: ", recall) #??
+#print("Precision: ", precision) #??
+#print("Recall: ", recall) #??
 
