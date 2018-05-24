@@ -36,7 +36,7 @@ args = vars(ap.parse_args())
 
 classVar = pd.read_csv(args['class'], header='infer')
 
-features = pd.read_csv(args['data'],sep=",", header=None)
+features = pd.read_csv(args['data'],sep=" ", header=None)
 #print(features.head(n=5))
 df = pd.concat([classVar['x'].reset_index(), features], axis=1)
 
