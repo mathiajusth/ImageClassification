@@ -1,33 +1,3 @@
-
-"""
-from sklearn.datasets import make_classification
-from sklearn.multioutput import MultiOutputClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.utils import shuffle
-import numpy as np
-X, y1 = make_classification(n_samples=10, n_features=100, n_informative=30, n_classes=3, random_state=1)
-y2 = shuffle(y1, random_state=1)
-y3 = shuffle(y1, random_state=2)
-Y = np.vstack((y1, y2, y3)).T
-n_samples, n_features = X.shape # 10,100
-n_outputs = Y.shape[1] # 3
-n_classes = 3
-
-
-print(X)
-print(Y)
-
-
-if __name__ == '__main__':
-	forest = RandomForestClassifier(n_estimators=100, random_state=1)
-	multi_target_forest = MultiOutputClassifier(forest, n_jobs=-1)
-	a=multi_target_forest.fit(X, Y).predict(X)
-	print(a)
-
-"""
-
-
-
 #Multilabel classification
 import math
 from sklearn.manifold import TSNE
@@ -45,8 +15,12 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import LinearSVC
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.multiclass import OneVsRestClassifier
+from sklearn.metrics import hamming_loss
+from sklearn.linear_model import LogisticRegression
+from sklearn import svm
 
-
+import random
+random.seed(1234)
 
 ap = argparse.ArgumentParser()
 
@@ -58,8 +32,11 @@ ap.add_argument("-class", "--class", required = False,
 
 args = vars(ap.parse_args())
 
+if args['data'] == "Pascal_SIFT_features.txt":
+	X = pd.read_csv(args['data'],sep=" ", header=None)
+else:
+	X = pd.read_csv(args['data'],sep=",", header=None)
 
-X = pd.read_csv(args['data'], header=None)
 
 y = pd.read_csv(args['class'], sep =",", header='infer')
 
@@ -68,28 +45,29 @@ y = pd.concat([y['isA'].reset_index(), y['isP']], axis=1)
 del y['index']
 
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1/7.0, random_state=42)
 
 
 from sklearn.decomposition import PCA
 # Make an instance of the Model
-pca = PCA(.99)
+"""
+pca = PCA(.90)
 
 pca.fit(X_train)
 X_train = pca.transform(X_train)
 X_test = pca.transform(X_test)
-
+"""
 #print(X_train.head())
 #print(y_train.head())
 
-"""
+
 # using binary relevance
 from skmultilearn.problem_transform import BinaryRelevance
 from sklearn.naive_bayes import GaussianNB
 
 # initialize binary relevance multi-label classifier
 # with a gaussian naive bayes base classifier
-classifier = BinaryRelevance(GaussianNB())
+classifier = BinaryRelevance(LogisticRegression())
 
 # train
 classifier.fit(X_train, y_train)
@@ -98,10 +76,11 @@ classifier.fit(X_train, y_train)
 predictions = classifier.predict(X_test)
 
 
-from sklearn.metrics import accuracy_score
-print("Binary relevance: ", accuracy_score(y_test,predictions))
-"""
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report
+#print("Binary relevance: ", accuracy_score(y_test,predictions))
+#print("Hamming loss: ", hamming_loss(y_test, predictions))
+
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import make_classification
 from sklearn.multioutput import MultiOutputClassifier
@@ -120,8 +99,8 @@ if __name__ == '__main__':
 
 	 
 	print("Sum accuracy: ", acc/(len(y_test)))
-"""
 
+"""
 
 
 #y = MultiLabelBinarizer().fit_transform(y)
@@ -130,10 +109,24 @@ if __name__ == '__main__':
 
 #using classifier chains
 from skmultilearn.problem_transform import ClassifierChain
-from sklearn.naive_bayes import GaussianNB
+
 
 # initialize classifier chains multi-label classifier
 # with a gaussian naive bayes base classifier
+classifier = ClassifierChain(LogisticRegression())
+
+# train
+classifier.fit(X_train, y_train)
+
+# predict
+predictions = classifier.predict(X_test)
+#print(predictions)
+print("Log reg Classifier chains: ", accuracy_score(y_test,predictions))
+print(classification_report(y_test,predictions))
+
+#In the multilabel case with binary label indicators:
+print("Hamming loss: ", hamming_loss(y_test, predictions))
+print(" ")
 classifier = ClassifierChain(GaussianNB())
 
 # train
@@ -142,19 +135,52 @@ classifier.fit(X_train, y_train)
 # predict
 predictions = classifier.predict(X_test)
 #print(predictions)
-print("Classifier chains: ", accuracy_score(y_test,predictions))
+print("Naive B Classifier chains: ", accuracy_score(y_test,predictions))
+print(classification_report(y_test,predictions))
 
 #In the multilabel case with binary label indicators:
-from sklearn.metrics import hamming_loss
 print("Hamming loss: ", hamming_loss(y_test, predictions))
+print(" ")
 
-"""
+
+
+classifier = ClassifierChain(svm.SVC(decision_function_shape='ovo'))
+
+# train
+classifier.fit(X_train, y_train)
+
+# predict
+predictions = classifier.predict(X_test)
+#print(predictions)
+print("SVM Classifier chains: ", accuracy_score(y_test,predictions))
+print(classification_report(y_test,predictions))
+
+#In the multilabel case with binary label indicators:
+print("Hamming loss: ", hamming_loss(y_test, predictions))
+print(" ")
+
+
+
+
 # using Label Powerset
 from skmultilearn.problem_transform import LabelPowerset
-from sklearn.naive_bayes import GaussianNB
 
 # initialize Label Powerset multi-label classifier
 # with a gaussian naive bayes base classifier
+classifier = LabelPowerset(LogisticRegression())
+
+# train
+classifier.fit(X_train, y_train)
+
+# predict
+predictions = classifier.predict(X_test)
+
+print("Log Reg Label Powerset: ", accuracy_score(y_test,predictions))
+print(classification_report(y_test,predictions))
+print("Hamming loss: ", hamming_loss(y_test, predictions))
+print(" ")
+
+
 classifier = LabelPowerset(GaussianNB())
 
 # train
@@ -163,21 +189,25 @@ classifier.fit(X_train, y_train)
 # predict
 predictions = classifier.predict(X_test)
 
-print("Label Powerset: ", accuracy_score(y_test,predictions))
+print("Naive B Label Powerset: ", accuracy_score(y_test,predictions))
+print(classification_report(y_test,predictions))
+print("Hamming loss: ", hamming_loss(y_test, predictions))
+print(" ")
 
 
 
 
-from skmultilearn.adapt import MLkNN
-
-classifier = MLkNN(k=20)
+classifier = LabelPowerset(svm.SVC(decision_function_shape='ovo'))
 
 # train
 classifier.fit(X_train, y_train)
 
 # predict
 predictions = classifier.predict(X_test)
+#print(predictions)
+print("SVM Classifier chains: ", accuracy_score(y_test,predictions))
+print(classification_report(y_test,predictions))
 
-print("MLkNN: ", accuracy_score(y_test,predictions))
-"""
-
+#In the multilabel case with binary label indicators:
+print("Hamming loss: ", hamming_loss(y_test, predictions))
+print(" ")
